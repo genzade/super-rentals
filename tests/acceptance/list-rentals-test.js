@@ -1,7 +1,19 @@
 import { test } from 'qunit';
 import moduleForAcceptance from 'super-rentals/tests/helpers/module-for-acceptance';
+import Ember from 'ember';
 
-moduleForAcceptance('Acceptance | homepage');
+let StubMapsService = Ember.Service.extend({
+  getMapElement() {
+    return document.createElement('div');
+  }
+});
+
+moduleForAcceptance('Acceptance | list rentals', {
+  beforeEach() {
+    this.application.register('service:stubMaps', StubMapsService);
+    this.application.inject('component:location-map', 'maps', 'service:stubMaps');
+  }
+});
 
 test('should list available rentals', function(assert) {
   visit('/');
@@ -28,11 +40,11 @@ test('should link to contact information', function(assert) {
     assert.equal(currentURL(), '/contact', 'should navigate to contact');
   });
 });
-
+//
 test('should filter the list of rentals by city', function(assert) {
   visit('/');
-  fillIn('.list-filter input', 'keyup', 69);
-  keyEvent();
+  fillIn('.list-filter input', 'seattle');
+  keyEvent('.list-filter input', 'keyup', 69);
 
   andThen(function() {
     assert.equal(find('.listing').length, 1, 'should show one listing');
